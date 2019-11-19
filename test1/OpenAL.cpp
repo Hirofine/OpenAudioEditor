@@ -5,6 +5,7 @@
 #include "..\OpenAL\include\al.h"
 #include "..\OpenAL\include\alc.h"
 #include "..\libsndfile\include\sndfile.h"
+#include <string.h>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -171,6 +172,25 @@ void ShutdownOpenAL()
 ////////////////////////////////////////////////////////////
 int main()
 {
+	std::string arborescence;
+	char c;
+	FILE* test;
+	test = fopen("parametres.txt", "r");
+	if (test == NULL) {
+		fprintf(stderr, "Erreur: Impossible de créer le fichier\n");
+	}
+	else {
+		c = fgetc(test);
+		while (c != '$'){
+			arborescence.push_back(c);
+			c = fgetc(test);
+		} 
+	}
+	fclose(test);
+
+	
+
+	
 	// Récupération des devices disponibles
 	std::vector<std::string> Devices;
 	GetDevices(Devices);
@@ -191,11 +211,12 @@ int main()
 	std::string temp;
 	std::cout << "Specifier la location du fichier a lire :" << std::endl;
 	std::cin >> temp;
-	std::string emplacement = "C:/Users/romai/Documents/GitHub/OpenAudioEditor/sons/";
+	std::string emplacement = arborescence;
+
 	emplacement.append(temp);
 	//emplacement = "C:/Users/romai/Downloads/";
 
-
+	std::cout << "Le son a lire est : " << emplacement << std::endl;
 
 
 
@@ -239,6 +260,6 @@ int main()
 	std::cout << "Appuyez sur entree pour terminer..." << std::endl;
 	std::cin.ignore(10000, '\n');
 	std::cin.ignore(10000, '\n');
-
+	
 	return EXIT_SUCCESS;
 }
