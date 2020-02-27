@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <direct.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -172,7 +173,9 @@ void ShutdownOpenAL()
 ////////////////////////////////////////////////////////////
 int main()
 {
-	std::string arborescence;
+	std::string arborescence = "";
+	_chdir(".\\sons");
+	/*
 	char c;
 	FILE* test;
 	test = fopen("parametres.txt", "r");
@@ -187,7 +190,7 @@ int main()
 		} 
 	}
 	fclose(test);
-
+	*/
 	
 
 	
@@ -214,7 +217,7 @@ int main()
 	std::string emplacement = arborescence;
 
 	emplacement.append(temp);
-	//emplacement = "C:/Users/romai/Downloads/";
+	
 
 	std::cout << "Le son a lire est : " << emplacement << std::endl;
 
@@ -225,9 +228,15 @@ int main()
 		return EXIT_FAILURE;
 
 	// Création d'une source
+	ALfloat position[] = { 0.0, 0.0, 0.0 };
+	ALfloat velocite[] = { 0.0, 0.0, 0.0 };
+	ALfloat orientation[] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 	ALuint Source;
 	alGenSources(1, &Source);
 	alSourcei(Source, AL_BUFFER, Buffer);
+	alSourcefv(Source, AL_POSITION, position);
+	alSourcefv(Source, AL_VELOCITY, velocite);
+	alSourcefv(Source, AL_DIRECTION, orientation);
 
 	// On joue le son
 	alSourcePlay(Source);
@@ -245,6 +254,26 @@ int main()
 		alGetSourcei(Source, AL_SOURCE_STATE, &Status);
 	} while (Status == AL_PLAYING);
 
+	//Application d'un gain
+	ALfloat gain ;
+	std::cout << "Saisir la valeur du gain a appliquer lors de la réeccoute" << std::endl;
+	std::cin >> gain;
+	alSourcef(Source, AL_GAIN, gain);
+
+	// On joue le son
+	alSourcePlay(Source);
+
+	// On attend qu'il soit terminé
+	do
+	{
+		// Récupération et affichage de la position courante de lecture en secondes
+		ALfloat Seconds = 0.f;
+		alGetSourcef(Source, AL_SEC_OFFSET, &Seconds);
+		std::cout << "\rLecture en cours... " << std::fixed << std::setprecision(2) << Seconds << " sec";
+
+		// Récupération de l'état du son
+		alGetSourcei(Source, AL_SOURCE_STATE, &Status);
+	} while (Status == AL_PLAYING);
 	// Destruction du tampon
 	alDeleteBuffers(1, &Buffer);
 
